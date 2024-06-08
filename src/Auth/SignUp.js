@@ -1,22 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import api from '../api'; 
 export const SignUp = () => {
     const navigate = useNavigate();
+    const [submitted, setSubmitted] = useState(false);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
+    const [dealershipname, setDealershipName] = useState('');
+    const [dealershipid, setDealershipId] = useState('');
     const [phonenumber, setPhoneNumber] = useState('');
     const [postalcode, setPostalCode] = useState('');
     const [city, setCity] = useState('');
+
     const [firstNameError, setFirstNameError] = useState('');
     const [lastNameError, setLastNameError] = useState('');
     const [lastemailError, setLastEmailError] = useState('');
     const [lastphonenumberError, setPhoneNumberError] = useState('');
     const [lastpostalcodeError, setPostalCodeError] = useState('');
     const [cityError, setCityError] = useState('');
-   
-    const handleSignUp = (event) => {
+    const [errors, setErrors] = useState({});
+
+    const handleSignUp = async (event) => {
         event.preventDefault();
         if (firstName.trim() === '') {
             setFirstNameError('First name cannot be empty');
@@ -52,7 +57,28 @@ export const SignUp = () => {
 
         if (firstName.trim() !== '' && lastName.trim() !== '' && email.trim() !== '' && phonenumber.trim() !== '' && city.trim() !== '') {
             // Navigate to the desired page
-            navigate('/sellerin');
+           
+        }
+        try {
+            const response = await api.post('/auth/dealer/register', {
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                phone: phonenumber,
+                dealer_name: dealershipname,
+                dealershipId: dealershipid,
+                dealer_address: city,
+            });
+    
+            console.log('Registration successful:', response.data);
+            setSubmitted(true);
+            setTimeout(() => {
+                navigate('/dealerin');
+              }, 3000);
+        }catch (error) {
+            console.error('Error occurred during registration:', error);
+            const errorMessage = error.response.data; // Log the error response
+            setErrors(errorMessage);
         }
     };
      
@@ -101,10 +127,10 @@ export const SignUp = () => {
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">    
-                            <input type="text" class="form-control" id="inputcompanyname" placeholder="Dealership Name*"/>
+                            <input type="text" class="form-control" id="inputcompanyname" value={dealershipname}   onChange={(e) => setDealershipName(e.target.value)} placeholder="Dealership Name*"/>
                         </div>
                         <div class="form-group col-md-6">    
-                            <input type="text" class="form-control" id="inputcompanyname" placeholder="Dealership ID*"/>
+                            <input type="text" class="form-control" id="inputcompanyname" value={dealershipid}   onChange={(e) => setDealershipId(e.target.value)} placeholder="Dealership ID*"/>
                         </div>
                    </div>
                     <div className="form-group">
@@ -128,9 +154,17 @@ export const SignUp = () => {
                         {lastphonenumberError && <div className="text-danger">{lastphonenumberError}</div>}
                     </div>
                     <p>Car-Chaser Technology needs the contact information you provide to us to contact you about our products and services. You may unsubscribe from these communications at any time. For information on how to unsubscribe, as well as our privacy practices and commitment to protecting your privacy, please review our Privacy Policy.</p>
+                    {errors && Object.keys(errors).length > 0 && (
+                        <div className="error-message text-danger">
+                            {Object.keys(errors).map((key, index) => (
+                            <p class="text-danger" key={index}>{errors[key]}</p>
+                            ))}
+                        </div>
+                        )}
+
                     <button type="submit" className="btn btn-primary w-100 py-3">Sign Up</button>
                     <div className="bottom-link pt-4 text-center">
-                        <p>Already have an account? <a href="seller-signin.html" className="w-100 py-3">Sign In</a></p>
+                        <p>Already have an account? <a href="/dealerin" className="w-100 py-3">Sign In</a></p>
                     </div>
                 </form>
             </div>

@@ -7,7 +7,7 @@ export const SellerNav = () => {
       <header className="py-3">
         <div className="container">
           <nav className="navbar navbar-expand-lg navbar-light p-0">
-            <a className="navbar-brand" href="#">
+            <a className="navbar-brand" href="https://staging.carchaser.ca/">
               <img src="../images/logo.png" alt="logo-img" />
             </a>
             <button
